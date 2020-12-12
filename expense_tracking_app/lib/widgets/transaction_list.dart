@@ -1,3 +1,4 @@
+import 'package:expense_tracking_app/widgets/transaction_item.dart';
 import 'package:intl/intl.dart';
 
 import '../models/transaction.dart';
@@ -20,7 +21,7 @@ class TransactionList extends StatelessWidget {
                     "No transactions",
                     style: Theme.of(context).textTheme.title,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Container(
@@ -35,40 +36,10 @@ class TransactionList extends StatelessWidget {
             })
           : ListView.builder(
               itemBuilder: (ctx, index) {
-                return Card(
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
-                  elevation: 5,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 30,
-                      child: Padding(
-                        padding: EdgeInsets.all(6),
-                        child: FittedBox(
-                          child: Text("R${transactions[index].amount}"),
-                        ),
-                      ),
-                    ),
-                    title: Text(
-                      transactions[index].title,
-                      style: Theme.of(context).textTheme.title,
-                    ),
-                    subtitle: Text(
-                      DateFormat.yMMMMd().format(transactions[index].date),
-                    ),
-                    trailing: MediaQuery.of(context).size.width > 460
-                        ? FlatButton.icon(
-                            onPressed: () =>
-                                deleteCallback(transactions[index].id),
-                            textColor: Theme.of(context).errorColor,
-                            icon: Icon(Icons.delete),
-                            label: Text('Delete'))
-                        : IconButton(
-                            icon: Icon(Icons.delete),
-                            color: Theme.of(context).errorColor,
-                            onPressed: () =>
-                                deleteCallback(transactions[index].id),
-                          ),
-                  ),
+                return TransactionItem(
+                  transaction: transactions[index],
+                  deleteCallback: deleteCallback,
+                  key: ValueKey(transactions[index].id),
                 );
               },
               itemCount: transactions.length,
