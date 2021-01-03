@@ -17,6 +17,8 @@ class ProductItem extends StatelessWidget {
     // var x = context.select<Product, bool>((x) => x.isFavorite);
     final cart = Provider.of<Cart>(context, listen: false);
 
+    final _scaffold = Scaffold.of(context);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -39,8 +41,17 @@ class ProductItem extends StatelessWidget {
               icon: Icon(
                 product.isFavorite ? Icons.favorite : Icons.favorite_border,
               ),
-              onPressed: () {
-                product.toggleFavoriteStatus();
+              onPressed: () async {
+                try {
+                  await product.toggleFavoriteStatus();
+                } catch (e) {
+                  _scaffold.hideCurrentSnackBar();
+                  _scaffold.showSnackBar(
+                    SnackBar(
+                      content: Text("Failed to toggle favourite status!"),
+                    ),
+                  );
+                }
               },
               color: Theme.of(context).accentColor,
             ),
