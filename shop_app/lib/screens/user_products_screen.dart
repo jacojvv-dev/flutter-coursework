@@ -10,8 +10,6 @@ class UserProductsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final productsProvider = Provider.of<Products>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Your Products"),
@@ -25,24 +23,38 @@ class UserProductsScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: RefreshIndicator(
-        onRefresh: productsProvider.fetchAndSetProducts,
-        child: Padding(
-          padding: EdgeInsets.all(8),
-          child: ListView.builder(
-            itemCount: productsProvider.items.length,
-            itemBuilder: (_, i) => Column(
-              children: [
-                UserProductItem(
-                  productsProvider.items[i].id,
-                  productsProvider.items[i].title,
-                  productsProvider.items[i].imageUrl,
-                ),
-                Divider()
-              ],
-            ),
-          ),
-        ),
+      body: FutureBuilder(
+        future: Provider.of<Products>(context, listen: false)
+            .fetchAndSetProducts(true),
+        builder: (ctx, snapShot) =>
+            snapShot.connectionState == ConnectionState.waiting
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () {
+                      return Provider.of<Products>(context, listen: false)
+                          .fetchAndSetProducts(true);
+                    },
+                    child: Consumer<Products>(
+                      builder: (ctx, data, _) => Padding(
+                        padding: EdgeInsets.all(8),
+                        child: ListView.builder(
+                          itemCount: data.items.length,
+                          itemBuilder: (_, i) => Column(
+                            children: [
+                              UserProductItem(
+                                data.items[i].id,
+                                data.items[i].title,
+                                data.items[i].imageUrl,
+                              ),
+                              Divider()
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
       ),
     );
   }
